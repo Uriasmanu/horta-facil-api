@@ -1,63 +1,56 @@
 ﻿using horta_facil_api.Data;
+using horta_facil_api.DTOs;
 using horta_facil_api.Models;
+using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace horta_facil_api.Service
 {
-    private readonly AppDbContext _context;
-
-    public LoginService (AppDbContext context)
+    public class LoginService 
     {
-        _context = context;
-    }
-
-    public async Task<bool> UserExistsAsync(string username)
-    {
-        return await _context.Logins.AnyAsync(l => l.Username == username);
-    }
-
-    public async Task<Login> CreateUserAsync(Login login)
-    {
-        login.Password = SenhaHasher.HashSenha(login.Password); // Hashing da senha
-        _context.Logins.Add(login);
-        await _context.SaveChangesAsync();
-        return login;
-    }
-
-
-    public async Task<Login?> AuthenticateUserAsync(string username, string password)
-    {
-        var user = await _context.Logins.FirstOrDefaultAsync(l => l.Username == username);
-
-        if (user != null && SenhaHasher.VerifyPassword(user.Password, password))
+        private readonly IMongoCollection<Login> _logins;
+        public LoginService(MongoDbContext context)
         {
-            return user;
+            _logins = context.Logins;
         }
 
-        return null;
-    }
-
-    public async Task<LoginDTO?> GetUserByIdAsync(Guid id)
-    {
-        var login = await _context.Logins.FindAsync(id);
-
-        if (login == null) return null;
-
-        return new LoginDTO
+        // Registrar usuario
+        public async Task<bool> RegistrarLogin(Login novoLogin)
         {
-            Id = login.Id,
-            Username = login.Username
-        };
-    }
-
-    public async Task<IEnumerable<LoginDTO>> GetAllUsersAsync()
-    {
-        return await _context.Logins
-            .Select(login => new LoginDTO
+            var loginExistente = await _logins.Find(x => x.Email == novoLogin.Email).FirstOrDefaultAsync();
+            if (loginExistente != null)
             {
-                Id = login.Id,
-                Username = login.Username
-            })
-            .ToListAsync();
+                return false;
+            }
+
+            novoLogin.Senha = SenhaHasher.HashSenha(novoLogin.Senha);
+
+            await _logins.InsertOneAsync(novoLogin);
+            return true;
+        }
+
+        // Buscar todos os usuarios
+        public async Task<List<Login>> BuscarTodosLogins()
+        {
+            return await _logins.Find(new BsonDocument()).ToListAsync();
+        }
+
+        // Buscar usuario por id
+        public async Task<Login> BuscarUsuarioPorId(Guid id)
+        {
+            return await _logins.Find(x => x.Id == id).FirstOrDefaultAsync();
+        }
+
+        // Deletar usuario por id
+        public async Task<bool> ExcluirUsuarioPorId(Guid id)
+        {
+            var resultado = await _logins.DeleteOneAsync(x => x.Id == id);
+            return resultado.DeletedCount > 0;
+        }
     }
 }

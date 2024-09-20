@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using horta_facil_api.Models;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace horta_facil_api.Data
@@ -13,10 +14,18 @@ namespace horta_facil_api.Data
             var client = new MongoClient("mongodb+srv://maanoelaurias:eiOBjzDkGXKfMp1x@cluster0.vergn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0");
 
             // Selecionar o banco de dados
-            _database = client.GetDatabase("hortaFacil");
+            _database = client.GetDatabase("horta_facil_db");
         }
 
-       
+        // Método para obter a coleção de 'Login'
+        public IMongoCollection<Login> Logins
+        {
+            get
+            {
+                return _database.GetCollection<Login>("Logins");
+            }
+        }
+
     }
 
 }

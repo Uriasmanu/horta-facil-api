@@ -4,22 +4,18 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MongoDB.Driver;
+using System;
 using System.Text;
 
 string chaveSecreta = "e3c46810-b96e-40d9-a9eb-9ffa7b373e5b";
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure the database connection
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql("Host=ep-quiet-sky-a5mjgav5.us-east-2.aws.neon.tech;Username=fitBoxdb_owner;Password=39BlfTwIKSZD;Database=fitBoxdb;sslmode=Require",
-    npgsqlOptions =>
-    {
-        npgsqlOptions.EnableRetryOnFailure(
-            maxRetryCount: 5,
-            maxRetryDelay: TimeSpan.FromSeconds(30),
-            errorCodesToAdd: null); // Substituindo por PostgreSQL
-    }));
+
+// Configure the MongoDB connection
+builder.Services.AddSingleton<IMongoClient>(new MongoClient("mongodb+srv://maanoelaurias:eiOBjzDkGXKfMp1x@cluster0.vergn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"));
+builder.Services.AddScoped<MongoDbContext>();
 
 
 builder.Services.AddAuthentication(options =>
@@ -104,11 +100,12 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseSwagger();
-app.UseSwagger(c =>
+app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-    c.RoutePrefix = string.Empty;
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "FitBox - Gestor de Marmitas V1");
+    c.RoutePrefix = string.Empty; // Para acessar a documentação na raiz do projeto
 });
+
 
 app.MapControllerRoute(
     name: "default",
