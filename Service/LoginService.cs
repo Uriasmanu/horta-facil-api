@@ -19,6 +19,19 @@ namespace horta_facil_api.Service
             _logins = context.Logins;
         }
 
+        public async Task<Login> AuthenticateUserAsync(string email, string senha)
+        {
+            var login = await _logins.Find(x => x.Email == email).FirstOrDefaultAsync();
+
+            if (login == null || !SenhaHasher.VerifyPassword(login.Senha, senha))
+            {
+                return null;  // Se o usuário não for encontrado ou a senha estiver incorreta
+            }
+
+            return login; // Retorna o objeto login, que tem as informações do usuário
+        }
+
+
         // Registrar usuario
         public async Task<bool> RegistrarLogin(Login novoLogin)
         {
@@ -35,15 +48,41 @@ namespace horta_facil_api.Service
         }
 
         // Buscar todos os usuarios
-        public async Task<List<Login>> BuscarTodosLogins()
+        public async Task<List<LoginDTO>> BuscarTodosLogins()
         {
-            return await _logins.Find(new BsonDocument()).ToListAsync();
+            // Busca todos os logins do banco de dados
+            var logins = await _logins.Find(new BsonDocument()).ToListAsync();
+
+            // Mapeia cada Login para um LoginDTO
+            var loginDTOs = logins.Select(login => new LoginDTO
+            {
+                Id = login.Id,
+                UserName = login.Username,
+                email = login.Email,
+
+                
+            }).ToList();
+
+            return loginDTOs;
         }
 
         // Buscar usuario por id
-        public async Task<Login> BuscarUsuarioPorId(Guid id)
+        public async Task<LoginDTO> BuscarUsuarioPorId(Guid id)
         {
-            return await _logins.Find(x => x.Id == id).FirstOrDefaultAsync();
+            var login = await _logins.Find(x => x.Id == id).FirstOrDefaultAsync();
+            
+            if(login == null)
+            {
+                return null;
+            }
+
+            return new LoginDTO
+            {
+                Id = login.Id,
+                UserName = login.Username,
+                email = login.Email,
+            };
+
         }
 
         // Deletar usuario por id

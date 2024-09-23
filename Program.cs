@@ -1,4 +1,5 @@
 using horta_facil_api.Data;
+using horta_facil_api.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<IMongoClient>(new MongoClient("mongodb+srv://maanoelaurias:eiOBjzDkGXKfMp1x@cluster0.vergn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"));
 builder.Services.AddScoped<MongoDbContext>();
 
+builder.Services.AddScoped<LoginService>();
 
 builder.Services.AddAuthentication(options =>
 {

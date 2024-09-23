@@ -1,10 +1,11 @@
 ﻿using horta_facil_api.Models;
+using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace horta_facil_api.Data
 {
-    public class MongoDbContext
+    public class MongoDbContext 
     {
         private readonly IMongoDatabase _database;
 

@@ -1,4 +1,5 @@
 ﻿using horta_facil_api.Models;
+using horta_facil_api.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -54,3 +55,4 @@ namespace horta_facil_api.Controllers
             return Ok(new { token = jwtToken });
         }
     }
+}

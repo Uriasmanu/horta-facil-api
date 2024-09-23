@@ -8,7 +8,7 @@ namespace horta_facil_api.Models
         public Guid Id { get; set; }
 
         [BsonElement("nome")]
-        public string UserName { get; set; }
+        public string Username { get; set; }
 
         [BsonElement("email")]
         public string Email { get; set; }
