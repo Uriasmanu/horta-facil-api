@@ -16,9 +16,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Configure the MongoDB connection
 builder.Services.AddSingleton<IMongoClient>(new MongoClient("mongodb+srv://maanoelaurias:eiOBjzDkGXKfMp1x@cluster0.vergn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"));
-builder.Services.AddScoped<MongoDbContext>();
 
+builder.Services.AddScoped<MongoDbContext>();
 builder.Services.AddScoped<LoginService>();
+builder.Services.AddScoped<PlantaService>();
 
 builder.Services.AddAuthentication(options =>
 {

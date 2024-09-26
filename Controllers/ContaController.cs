@@ -24,7 +24,7 @@ namespace horta_facil_api.Controllers
         [HttpPost("authenticate")]
         public async Task<ActionResult<string>> Authenticate([FromBody] LoginModel loginModel)
         {
-            var user = await _loginService.AuthenticateUserAsync(loginModel.Username, loginModel.Password);
+            var user = await _loginService.AuthenticateUserAsync(loginModel.Email, loginModel.Password);
 
             if (user == null)
             {
@@ -34,7 +34,7 @@ namespace horta_facil_api.Controllers
             // Geração do token JWT
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Username),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };

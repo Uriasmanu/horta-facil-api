@@ -27,6 +27,14 @@ namespace horta_facil_api.Data
             }
         }
 
+        public IMongoCollection<Plantas> Planta
+        {
+            get
+            {
+                return _database.GetCollection<Plantas>("Planta");
+            }
+        }
+
     }
 
 }
