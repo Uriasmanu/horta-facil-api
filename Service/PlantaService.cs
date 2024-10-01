@@ -29,5 +29,22 @@ namespace horta_facil_api.Service
 
             return plantaDTO;
         }
+
+        public async Task<PlantaDTO> BuscarPlantaPorId(Guid id)
+        {
+            var plantas = await _plantas.Find(x => x.Id == id).FirstOrDefaultAsync();
+
+            if (plantas == null)
+            {
+                return null;
+            }
+
+            return new PlantaDTO(plantas.DiaDoPlantio)
+            {
+                Id = plantas.Id,
+                NomePlanta = plantas.NomePlanta,
+                DiasParaColheita = plantas.DiasParaColheita,
+            };
+        }
     }
 }

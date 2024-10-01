@@ -21,5 +21,17 @@ namespace horta_facil_api.Controllers
             var plantas = await _plantaService.BuscarTodasPlanta();
             return Ok(plantas);
         }
+
+        [HttpGet("plantas/{id}")]
+        public async Task<ActionResult> BuscarPlantasPorId( string id)
+        {
+            var plantas = await _plantaService.BuscarPlantaPorId(System.Guid.Parse(id));
+
+            if (plantas == null) 
+            {
+                return NotFound("Planta não encontrada");
+            }
+            return Ok(plantas);
+        }
     }
 }
