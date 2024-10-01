@@ -59,7 +59,7 @@ builder.Services.AddControllersWithViews()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "FitBox - Gestor de Marmitas", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Horta Facil", Version = "v1" });
 
     var securitySchema = new OpenApiSecurityScheme
     {
@@ -105,7 +105,7 @@ app.UseAuthorization();
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "FitBox - Gestor de Marmitas V1");
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Horta facíl V1");
     c.RoutePrefix = string.Empty; // Para acessar a documentação na raiz do projeto
 });
 
