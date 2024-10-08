@@ -1,13 +1,14 @@
 using horta_facil_api.DTOs;
 using horta_facil_api.Models;
 using horta_facil_api.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace horta_facil_api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-
+    [Authorize]
     public class PlantaController : ControllerBase
     {
         private readonly PlantaService _plantaService;
