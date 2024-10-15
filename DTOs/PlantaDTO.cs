@@ -7,6 +7,7 @@ namespace horta_facil_api.DTOs
         public Guid Id { get; set; }
         public string NomePlanta { get; set; }
         public int DiasParaColheita { get; set; }
+        public bool Ativo { get; set; } = true;
 
         [JsonIgnore]
         public DateTime DiaDoPlantio { get; set; }

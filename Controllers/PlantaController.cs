@@ -8,7 +8,7 @@ namespace horta_facil_api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    
     public class PlantaController : ControllerBase
     {
         private readonly PlantaService _plantaService;
@@ -26,7 +26,8 @@ namespace horta_facil_api.Controllers
                 Id = Guid.NewGuid(),
                 NomePlanta = novaPlantaDTO.NomePlanta,
                 DiasParaColheita = novaPlantaDTO.DiasParaColheita,
-                DiaDoPlantio = novaPlantaDTO.DiaDoPlantio // Agora você pode usar a data de plantio do DTO
+                DiaDoPlantio = novaPlantaDTO.DiaDoPlantio, // Agora você pode usar a data de plantio do DTO
+                
             };
 
             var plantaRegistrada = await _plantaService.RegistrarPlantas(plantaModel);
