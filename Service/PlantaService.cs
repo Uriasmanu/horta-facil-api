@@ -56,13 +56,19 @@ namespace horta_facil_api.Service
         {
             try
             {
-                var plantas = await _plantas.Find(new BsonDocument()).ToListAsync();
+                // Definir o filtro para buscar apenas plantas ativas
+                var filtro = Builders<Plantas>.Filter.Eq(planta => planta.Ativo, true);
 
+                // Aplicar o filtro ao buscar as plantas
+                var plantas = await _plantas.Find(filtro).ToListAsync();
+
+                // Mapear as plantas para DTOs
                 var plantaDTO = plantas.Select(plantas => new PlantaDTO(plantas.DiaDoPlantio)
                 {
                     Id = plantas.Id,
                     NomePlanta = plantas.NomePlanta,
                     DiasParaColheita = plantas.DiasParaColheita,
+                    Ativo = plantas.Ativo // Adicionar o campo Ativo no DTO
                 }).ToList();
 
                 return plantaDTO;
@@ -71,10 +77,10 @@ namespace horta_facil_api.Service
             {
                 // Tratamento específico para falhas no MongoDB
                 Console.WriteLine($"Erro ao buscar plantas no banco de dados: {mongoEx.Message}");
-                // Você pode retornar uma lista vazia ou lançar uma exceção dependendo do seu caso de uso
                 return new List<PlantaDTO>();
             }
         }
+
 
         public async Task<PlantaDTO> BuscarPlantaPorId(Guid id)
         {
@@ -90,13 +96,34 @@ namespace horta_facil_api.Service
                 Id = plantas.Id,
                 NomePlanta = plantas.NomePlanta,
                 DiasParaColheita = plantas.DiasParaColheita,
+                Ativo = plantas.Ativo
             };
         }
 
-        public async Task<bool> DeletarPlantaPorId(Guid id)
+        public async Task<bool> DesativarPlantaPorId(Guid id)
         {
-            var resultado = await _plantas.DeleteOneAsync(x => x.Id == id);
-            return resultado.DeletedCount > 0;
+            // Buscar a planta no banco de dados com base no modelo 'Plantas'
+            var planta = await _plantas.Find(x => x.Id == id).FirstOrDefaultAsync();
+
+            // Verificar se a planta foi encontrada
+            if (planta == null)
+            {
+                return false; // Planta não encontrada
+            }
+
+            // Definir o campo 'Ativo' como false
+            planta.Ativo = false;
+
+            // Atualizar o documento no banco de dados com o modelo 'Plantas' modificado
+            var resultado = await _plantas.ReplaceOneAsync(
+                Builders<Plantas>.Filter.Eq(x => x.Id, id),
+                planta
+            );
+
+            // Retornar verdadeiro se pelo menos um documento foi atualizado
+            return resultado.ModifiedCount > 0;
         }
+
+
     }
 }

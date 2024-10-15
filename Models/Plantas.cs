@@ -6,6 +6,6 @@
         public string NomePlanta { get; set; }
         public DateTime DiaDoPlantio { get; set; } = DateTime.Now;
         public int DiasParaColheita { get; set; }
-        public bool Ativo { get; set; } = true;
+        public bool Ativo { get; set; }
     }
 }

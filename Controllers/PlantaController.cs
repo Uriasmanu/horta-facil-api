@@ -60,16 +60,18 @@ namespace horta_facil_api.Controllers
         }
 
         [HttpDelete("plantas/{id}")]
-        public async Task<ActionResult> DeletarPlantasPorId(string id)
+        public async Task<ActionResult> DesativarPlantasPorId(string id)
         {
-            var plantaDeletada = await _plantaService.DeletarPlantaPorId(System.Guid.Parse(id));
+            // Tentar desativar a planta pelo ID fornecido
+            var plantaDesativada = await _plantaService.DesativarPlantaPorId(Guid.Parse(id));
 
-            if (!plantaDeletada)
+            if (!plantaDesativada)
             {
-                return NotFound("Planta não encontrada ou ja deletada");
+                return NotFound("Planta não encontrada ou já desativada.");
             }
 
-            return Ok("planta deletada com sucesso");
+            return Ok("Planta desativada com sucesso.");
         }
+
     }
 }
