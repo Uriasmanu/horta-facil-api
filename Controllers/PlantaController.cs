@@ -27,6 +27,7 @@ namespace horta_facil_api.Controllers
                 NomePlanta = novaPlantaDTO.NomePlanta,
                 DiasParaColheita = novaPlantaDTO.DiasParaColheita,
                 DiaDoPlantio = novaPlantaDTO.DiaDoPlantio, // Agora você pode usar a data de plantio do DTO
+                Ativo = novaPlantaDTO.Ativo = true,
                 
             };
 
