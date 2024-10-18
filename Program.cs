@@ -20,6 +20,7 @@ builder.Services.AddSingleton<IMongoClient>(new MongoClient("mongodb+srv://maano
 builder.Services.AddScoped<MongoDbContext>();
 builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped<PlantaService>();
+builder.Services.AddScoped<TarefasService>();
 
 builder.Services.AddAuthentication(options =>
 {
