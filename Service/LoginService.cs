@@ -32,21 +32,6 @@ namespace horta_facil_api.Service
         }
 
 
-        // Registrar usuario
-        public async Task<bool> RegistrarLogin(Login novoLogin)
-        {
-            var loginExistente = await _logins.Find(x => x.Email == novoLogin.Email).FirstOrDefaultAsync();
-            if (loginExistente != null)
-            {
-                return false;
-            }
-
-            novoLogin.Senha = SenhaHasher.HashSenha(novoLogin.Senha);
-
-            await _logins.InsertOneAsync(novoLogin);
-            return true;
-        }
-
         // Buscar todos os usuarios
         public async Task<List<LoginDTO>> BuscarTodosLogins()
         {

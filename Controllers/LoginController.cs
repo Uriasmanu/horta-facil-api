@@ -18,18 +18,6 @@ namespace horta_facil_api.Controllers
             _loginService = loginService;
         }
 
-        [HttpPost("register")]
-        public async Task<ActionResult> Registrar([FromBody] Login novoLogin)
-        {
-            var registroBemSucedido = await _loginService.RegistrarLogin(novoLogin);
-
-            if (!registroBemSucedido)
-            {
-                return BadRequest("Email já registrado");
-            }
-
-            return Ok("Usuario registrado com sucesso");
-        }
 
         [HttpGet("usuarios")]
         public async Task<ActionResult> MostrarUsuarios()
