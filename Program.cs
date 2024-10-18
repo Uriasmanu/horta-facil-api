@@ -1,10 +1,6 @@
 using horta_facil_api.Data;
-using horta_facil_api.Models;
 using horta_facil_api.Service;
-using horta_facil_api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
@@ -22,8 +18,6 @@ builder.Services.AddSingleton<IMongoClient>(new MongoClient("mongodb+srv://maano
 builder.Services.AddScoped<MongoDbContext>();
 builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped<PlantaService>();
-builder.Services.AddScoped<TarefasService>();
-builder.Services.AddScoped<VoluntariosService>();
 
 
 builder.Services.AddAuthentication(options =>
