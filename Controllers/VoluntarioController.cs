@@ -1,14 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
+using horta_facil_api.Data;
 using horta_facil_api.Models;
 using horta_facil_api.Services;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
 namespace horta_facil_api.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class VoluntariosController : ControllerBase
     {
         private readonly VoluntariosService _voluntariosService;
@@ -18,70 +16,58 @@ namespace horta_facil_api.Controllers
             _voluntariosService = voluntariosService;
         }
 
-        // GET: api/voluntarios
+        // POST api/voluntarios
+        [HttpPost]
+        public async Task<ActionResult<Voluntarios>> AddVoluntarioAsync([FromBody] Voluntarios voluntario)
+        {
+            var novoVoluntario = await _voluntariosService.AddVoluntarioAsync(voluntario);
+            return CreatedAtAction(nameof(GetVoluntarioByIdAsync), new { id = novoVoluntario.Id }, novoVoluntario);
+        }
+
+        // GET api/voluntarios
         [HttpGet]
-        public async Task<ActionResult<List<Voluntarios>>> GetAll()
+        public async Task<ActionResult<List<Voluntarios>>> GetAllVoluntariosAsync()
         {
             var voluntarios = await _voluntariosService.GetAllVoluntariosAsync();
             return Ok(voluntarios);
         }
 
-        // GET: api/voluntarios/{id}
+        // GET api/voluntarios/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<Voluntarios>> GetById(Guid id)
+        public async Task<ActionResult<string>> GetVoluntarioByIdAsync(Guid id)
         {
-            var voluntario = await _voluntariosService.GetVoluntarioByIdAsync(id);
-            if (voluntario == null)
+            var resultado = await _voluntariosService.GetVoluntarioByIdAsync(id);
+            if (resultado.Contains("não encontrado"))
             {
-                return NotFound();
+                return NotFound(resultado);
             }
-            return Ok(voluntario);
+            return Ok(resultado);
         }
 
-        // POST: api/voluntarios
-        [HttpPost]
-        public async Task<ActionResult<Voluntarios>> Create([FromBody] Voluntarios voluntario)
-        {
-            if (voluntario == null)
-            {
-                return BadRequest();
-            }
-
-            voluntario.Id = Guid.NewGuid(); // Gerar um novo ID
-            await _voluntariosService.AddVoluntarioAsync(voluntario);
-            return CreatedAtAction(nameof(GetById), new { id = voluntario.Id }, voluntario);
-        }
-
-        // PUT: api/voluntarios/{id}
+        // PUT api/voluntarios/{id}
         [HttpPut("{id}")]
-        public async Task<ActionResult<Voluntarios>> Update(Guid id, [FromBody] Voluntarios voluntario)
+        public async Task<ActionResult<Voluntarios>> UpdateVoluntarioAsync(Guid id, [FromBody] Voluntarios voluntario)
         {
-            if (voluntario == null)
+            try
             {
-                return BadRequest();
+                var voluntarioAtualizado = await _voluntariosService.UpdateVoluntarioAsync(id, voluntario);
+                return Ok(voluntarioAtualizado);
             }
-
-            var existingVoluntario = await _voluntariosService.GetVoluntarioByIdAsync(id);
-            if (existingVoluntario == null)
+            catch (Exception)
             {
-                return NotFound();
+                return NotFound("ID não encontrado");
             }
-
-            await _voluntariosService.UpdateVoluntarioAsync(id, voluntario);
-            return NoContent();
         }
 
-        // DELETE: api/voluntarios/{id}
+        // DELETE api/voluntarios/{id}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<ActionResult> DeleteVoluntarioAsync(Guid id)
         {
-            var existingVoluntario = await _voluntariosService.GetVoluntarioByIdAsync(id);
-            if (existingVoluntario == null)
+            var resultado = await _voluntariosService.DeleteVoluntarioAsync(id);
+            if (!resultado)
             {
-                return NotFound();
+                return NotFound("ID não encontrado");
             }
-
-            await _voluntariosService.DeleteVoluntarioAsync(id);
             return NoContent();
         }
     }

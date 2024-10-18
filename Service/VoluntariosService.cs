@@ -17,6 +17,9 @@ namespace horta_facil_api.Services
         // Método para adicionar um novo voluntário
         public async Task<Voluntarios> AddVoluntarioAsync(Voluntarios voluntario)
         {
+            // Atribuir um novo Guid antes da inserção
+            voluntario.Id = Guid.NewGuid();
+
             await _voluntarios.InsertOneAsync(voluntario);
             return voluntario;
         }
