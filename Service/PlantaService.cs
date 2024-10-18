@@ -13,7 +13,7 @@ namespace horta_facil_api.Service
 
         public PlantaService(MongoDbContext context)
         {
-            _plantas = context.Planta;
+            _plantas = context.Plantas;
         }
 
         public async Task<bool> RegistrarPlantas ([FromBody] Plantas novaPlanta)

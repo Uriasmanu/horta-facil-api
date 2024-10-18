@@ -27,7 +27,7 @@ namespace horta_facil_api.Data
             }
         }
 
-        public IMongoCollection<Plantas> Planta
+        public IMongoCollection<Plantas> Plantas
         {
             get
             {
@@ -35,7 +35,13 @@ namespace horta_facil_api.Data
             }
         }
 
-
+        public IMongoCollection<Voluntarios> Voluntarios
+        {
+            get
+            {
+                return _database.GetCollection<Voluntarios>("Voluntarios");
+            }
+        }
     }
 
 }
