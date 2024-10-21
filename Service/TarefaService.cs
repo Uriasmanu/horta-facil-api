@@ -42,8 +42,6 @@ namespace horta_facil_api.Services
         }
 
 
-        
-
 
         public async Task<Tarefas> ObterTarefaPorId(Guid id)
         {
@@ -65,9 +63,16 @@ namespace horta_facil_api.Services
 
         public async Task<bool> RemoverTarefa(Guid id)
         {
+            var tarefaExistente = await _tarefas.Find(t => t.Id == id).FirstOrDefaultAsync();
+            if (tarefaExistente == null)
+            {
+                throw new NotFoundException($"A tarefa com o ID '{id}' não foi encontrada e não pode ser removida."); // Mensagem melhorada
+            }
+
             var resultado = await _tarefas.DeleteOneAsync(t => t.Id == id);
             return resultado.DeletedCount > 0; // Retorna true se a tarefa foi removida
         }
+
 
         public async Task<Tarefas> DefinirStatusTarefa(Guid id, int novoStatus)
         {

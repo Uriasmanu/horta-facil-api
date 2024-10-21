@@ -88,11 +88,24 @@ namespace horta_facil_api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> RemoverTarefa(Guid id)
         {
-            var removido = await _tarefaService.RemoverTarefa(id);
-            if (!removido)
-                return NotFound();
+            try
+            {
+                var tarefaRemovida = await _tarefaService.RemoverTarefa(id);
+                if (!tarefaRemovida)
+                {
+                    return NotFound($"A tarefa com o ID '{id}' não foi encontrada."); // Resposta 404 se a tarefa não existir
+                }
 
-            return NoContent();
+                return NoContent(); // Retorna 204 No Content se a tarefa for removida com sucesso
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message); // Retorna 404 com a mensagem da exceção personalizada
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erro ao remover a tarefa: {ex.Message}"); // Retorna 500 em caso de erro
+            }
         }
 
         [HttpPatch("{id}/status")]
