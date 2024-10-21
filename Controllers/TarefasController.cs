@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using horta_facil_api.Models;
 using horta_facil_api.Services;
+using static horta_facil_api.Services.TarefaService;
 
 namespace horta_facil_api.Controllers
 {
@@ -44,12 +45,23 @@ namespace horta_facil_api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> ObterTarefaPorId(Guid id)
         {
-            var tarefa = await _tarefaService.ObterTarefaPorId(id);
-            if (tarefa == null)
-                return NotFound();
-
-            return Ok(tarefa);
+            try
+            {
+                var tarefa = await _tarefaService.ObterTarefaPorId(id);
+                return Ok(tarefa); // Retorna a tarefa encontrada com status 200
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { mensagem = ex.Message }); // Retorno 404 com a mensagem de erro
+            }
+            catch (Exception ex)
+            {
+                // Loga a exceção (opcional)
+                return StatusCode(500, new { mensagem = "Erro interno do servidor.", detalhes = ex.Message }); // Retorno 500
+            }
         }
+
+
 
         [HttpGet]
         public async Task<IActionResult> ObterTodasTarefas()

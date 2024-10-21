@@ -28,11 +28,25 @@ namespace horta_facil_api.Services
             return resultado.IsAcknowledged ? tarefaAtualizada : null; // Retorna a tarefa atualizada se bem-sucedido
         }
 
+        public class NotFoundException : Exception
+        {
+            public NotFoundException(string message) : base(message) { }
+        }
+
+
         public async Task<Tarefas> ObterTarefaPorId(Guid id)
         {
             var tarefa = await _tarefas.Find(t => t.Id == id).FirstOrDefaultAsync();
+
+            if (tarefa == null)
+            {
+                throw new NotFoundException("Tarefa não encontrada para o ID fornecido."); // Lança uma exceção personalizada
+            }
+
             return tarefa; // Retorna a tarefa encontrada
         }
+
+
 
         public async Task<List<Tarefas>> ObterTodasTarefas()
         {
