@@ -30,17 +30,32 @@ namespace horta_facil_api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> AtualizarTarefa(Guid id, [FromBody] Tarefas tarefaAtualizada)
+        public async Task<IActionResult> AtualizarTarefa(Guid id, [FromBody] TarefaAtualizacaoDTO tarefaAtualizada)
         {
-            if (tarefaAtualizada == null || id != tarefaAtualizada.Id)
+            if (tarefaAtualizada == null)
                 return BadRequest("Dados da tarefa inválidos.");
 
-            var resultado = await _tarefaService.AtualizarTarefa(id, tarefaAtualizada);
-            if (resultado == null)
-                return NotFound();
+            // Mapeia TarefaAtualizacaoDTO para Tarefas
+            var tarefa = new Tarefas
+            {
+                Id = id,
+                Nome = tarefaAtualizada.Nome,
+                Descricao = tarefaAtualizada.Descricao,
+                // Mapeie outras propriedades conforme necessário
+            };
 
-            return NoContent();
+            try
+            {
+                await _tarefaService.AtualizarTarefa(tarefa);
+                return NoContent(); // Retorna 204 No Content se a atualização for bem-sucedida
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message); // Retorna 404 Not Found se a tarefa não for encontrada
+            }
         }
+
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> ObterTarefaPorId(Guid id)

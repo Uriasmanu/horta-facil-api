@@ -16,22 +16,33 @@ namespace horta_facil_api.Services
             _tarefas = context.Tarefas;
         }
 
+        public class NotFoundException : Exception
+        {
+            public NotFoundException(string message) : base(message) { }
+        }
+
         public async Task<Tarefas> CriarTarefa(Tarefas tarefa)
         {
             await _tarefas.InsertOneAsync(tarefa); // Insere a nova tarefa no MongoDB
             return tarefa; // Retorna a tarefa criada
         }
 
-        public async Task<Tarefas> AtualizarTarefa(Guid id, Tarefas tarefaAtualizada)
+        public async Task<Tarefas> AtualizarTarefa(Tarefas tarefaAtualizada)
         {
-            var resultado = await _tarefas.ReplaceOneAsync(t => t.Id == id, tarefaAtualizada);
-            return resultado.IsAcknowledged ? tarefaAtualizada : null; // Retorna a tarefa atualizada se bem-sucedido
+            // Tenta substituir a tarefa existente
+            var resultado = await _tarefas.ReplaceOneAsync(t => t.Id == tarefaAtualizada.Id, tarefaAtualizada);
+
+            // Verifica se a tarefa foi encontrada e atualizada
+            if (resultado.MatchedCount == 0)
+            {
+                throw new NotFoundException($"Tarefa com ID {tarefaAtualizada.Id} não encontrada."); // Lança uma exceção se a tarefa não existir
+            }
+
+            return tarefaAtualizada; // Retorna a tarefa atualizada se a operação foi bem-sucedida
         }
 
-        public class NotFoundException : Exception
-        {
-            public NotFoundException(string message) : base(message) { }
-        }
+
+        
 
 
         public async Task<Tarefas> ObterTarefaPorId(Guid id)
@@ -45,7 +56,6 @@ namespace horta_facil_api.Services
 
             return tarefa; // Retorna a tarefa encontrada
         }
-
 
 
         public async Task<List<Tarefas>> ObterTodasTarefas()
@@ -65,7 +75,7 @@ namespace horta_facil_api.Services
             if (tarefa != null)
             {
                 tarefa.DefinirStatus(novoStatus); // Atualiza o status
-                await AtualizarTarefa(id, tarefa); // Salva a tarefa atualizada
+                await AtualizarTarefa(tarefa); // Salva a tarefa atualizada
             }
             return tarefa; // Retorna a tarefa com o status atualizado
         }
