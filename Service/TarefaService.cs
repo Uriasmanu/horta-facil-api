@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using horta_facil_api.Data;
 using horta_facil_api.Models;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace horta_facil_api.Services
@@ -23,13 +24,34 @@ namespace horta_facil_api.Services
 
         public async Task<object> CriarTarefa(Tarefas tarefa)
         {
-            await _tarefas.InsertOneAsync(tarefa); // Insere a nova tarefa no MongoDB
-            return new
+            try
             {
-                Mensagem = "Tarefa registrada com sucesso!",
-                Tarefa = tarefa // Retorna a tarefa criada
-            };
+                tarefa.Id = new Guid(); // Garante que um novo _id seja gerado
+                await _tarefas.InsertOneAsync(tarefa); // Insere a nova tarefa no MongoDB
+                return new
+                {
+                    Mensagem = "Tarefa registrada com sucesso!",
+                    Tarefa = tarefa // Retorna a tarefa criada
+                };
+            }
+            catch (MongoWriteException ex) when (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
+            {
+                return new
+                {
+                    Mensagem = "Erro: não foi possível registrar a tarefa. Uma tarefa com o mesmo ID já existe. Por favor, verifique se o ID da tarefa não está duplicado.",
+                    Detalhes = ex.Message
+                };
+            }
+            catch (Exception ex)
+            {
+                return new
+                {
+                    Mensagem = "Erro ao registrar a tarefa.",
+                    Detalhes = ex.Message
+                };
+            }
         }
+
 
 
         public async Task<Tarefas> AtualizarTarefa(Tarefas tarefaAtualizada)

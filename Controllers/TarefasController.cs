@@ -22,17 +22,28 @@ namespace horta_facil_api.Controllers
         [HttpPost]
         public async Task<IActionResult> CriarTarefa([FromBody] Tarefas tarefa)
         {
+            // Verifica se a tarefa é nula
             if (tarefa == null)
             {
-                return BadRequest(new { Mensagem = "Dados da tarefa inválidos." });
+                return BadRequest(new { Mensagem = "Tarefa não pode ser nula." });
             }
 
+            // Chama o serviço para criar a tarefa
             var resultado = await _tarefaService.CriarTarefa(tarefa);
-            return CreatedAtAction(nameof(CriarTarefa), resultado); // Retorna 201 Created com o objeto de resultado
+
+            // Verifica se a tarefa foi criada com sucesso
+            if (resultado != null) // Aqui, você pode adicionar qualquer condição que defina sucesso
+            {
+                return Ok("Tarefa registrada com sucesso!"); // Retorna 200 OK com a mensagem de sucesso
+            }
+            else
+            {
+                return BadRequest("Não foi possível registrar a tarefa."); // Retorna 400 Bad Request
+            }
         }
 
 
-        [HttpPut("{id}")]
+            [HttpPut("{id}")]
         public async Task<IActionResult> AtualizarTarefa(Guid id, [FromBody] TarefaAtualizacaoDTO tarefaAtualizada)
         {
             if (tarefaAtualizada == null)
