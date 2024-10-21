@@ -28,46 +28,53 @@ namespace horta_facil_api.Controllers
                 return BadRequest(new { Mensagem = "Tarefa não pode ser nula." });
             }
 
+            // Se idVoluntario não for enviado, ele deve ser null
+            if (tarefa.IdVoluntario == Guid.Empty) // Opcional, se você quiser tratar especificamente
+            {
+                tarefa.IdVoluntario = null;
+            }
+
             // Chama o serviço para criar a tarefa
             var resultado = await _tarefaService.CriarTarefa(tarefa);
 
             // Verifica se a tarefa foi criada com sucesso
-            if (resultado != null) // Aqui, você pode adicionar qualquer condição que defina sucesso
+            if (resultado != null)
             {
-                return Ok("Tarefa registrada com sucesso!"); // Retorna 200 OK com a mensagem de sucesso
+                return Ok(new { Mensagem = "Tarefa registrada com sucesso!", Tarefa = resultado });
             }
             else
             {
-                return BadRequest("Não foi possível registrar a tarefa."); // Retorna 400 Bad Request
+                return BadRequest(new { Mensagem = "Não foi possível registrar a tarefa." });
             }
         }
 
 
-            [HttpPut("{id}")]
-        public async Task<IActionResult> AtualizarTarefa(Guid id, [FromBody] TarefaAtualizacaoDTO tarefaAtualizada)
-        {
-            if (tarefaAtualizada == null)
-                return BadRequest("Dados da tarefa inválidos.");
 
-            // Mapeia TarefaAtualizacaoDTO para Tarefas
-            var tarefa = new Tarefas
+        [HttpPut("{id}")]
+            public async Task<IActionResult> AtualizarTarefa(Guid id, [FromBody] TarefaAtualizacaoDTO tarefaAtualizada)
             {
-                Id = id,
-                Nome = tarefaAtualizada.Nome,
-                Descricao = tarefaAtualizada.Descricao,
-                // Mapeie outras propriedades conforme necessário
-            };
+                if (tarefaAtualizada == null)
+                    return BadRequest("Dados da tarefa inválidos.");
 
-            try
-            {
-                await _tarefaService.AtualizarTarefa(tarefa);
-                return NoContent(); // Retorna 204 No Content se a atualização for bem-sucedida
+                // Mapeia TarefaAtualizacaoDTO para Tarefas
+                var tarefa = new Tarefas
+                {
+                    Id = id,
+                    Nome = tarefaAtualizada.Nome,
+                    Descricao = tarefaAtualizada.Descricao,
+                    // Mapeie outras propriedades conforme necessário
+                };
+
+                try
+                {
+                    await _tarefaService.AtualizarTarefa(tarefa);
+                    return NoContent(); // Retorna 204 No Content se a atualização for bem-sucedida
+                }
+                catch (NotFoundException ex)
+                {
+                    return NotFound(ex.Message); // Retorna 404 Not Found se a tarefa não for encontrada
+                }
             }
-            catch (NotFoundException ex)
-            {
-                return NotFound(ex.Message); // Retorna 404 Not Found se a tarefa não for encontrada
-            }
-        }
 
 
 

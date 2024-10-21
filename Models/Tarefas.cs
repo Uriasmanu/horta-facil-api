@@ -6,7 +6,7 @@ namespace horta_facil_api.Models
         public string Nome { get; set; }
         public DateTime DataCriacao { get; set; } = DateTime.Now;
         public string Descricao { get; set; }
-        public Guid IdVoluntario { get; set; }
+        public Guid? IdVoluntario { get; set; }
 
         // Status da tarefa
         private int _status; // 0: Pendente, 1: Em Progresso, 2: Finalizado

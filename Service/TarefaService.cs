@@ -26,7 +26,12 @@ namespace horta_facil_api.Services
         {
             try
             {
-                tarefa.Id = new Guid(); // Garante que um novo _id seja gerado
+                tarefa.Id = Guid.NewGuid(); // Garante que um novo _id seja gerado
+                tarefa.DataCriacao = DateTime.Now; // Atribui a data de criação, se necessário
+
+                // Você pode adicionar lógica aqui se precisar fazer algo específico com IdVoluntario
+                // Exemplo: if (tarefa.IdVoluntario == null) { /* faça algo */ }
+
                 await _tarefas.InsertOneAsync(tarefa); // Insere a nova tarefa no MongoDB
                 return new
                 {
@@ -51,6 +56,7 @@ namespace horta_facil_api.Services
                 };
             }
         }
+
 
 
 

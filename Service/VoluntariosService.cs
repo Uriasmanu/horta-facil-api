@@ -40,7 +40,7 @@ namespace horta_facil_api.Services
                 return "ID não encontrado"; // Retorna mensagem personalizada
             }
 
-            return $"Voluntário encontrado: {voluntario.Nome}"; // Retorna o nome ou qualquer outro detalhe desejado
+            return voluntario.Nome; // Retorna o nome ou qualquer outro detalhe desejado
         }
 
 
