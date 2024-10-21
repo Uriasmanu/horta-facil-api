@@ -21,11 +21,16 @@ namespace horta_facil_api.Services
             public NotFoundException(string message) : base(message) { }
         }
 
-        public async Task<Tarefas> CriarTarefa(Tarefas tarefa)
+        public async Task<object> CriarTarefa(Tarefas tarefa)
         {
             await _tarefas.InsertOneAsync(tarefa); // Insere a nova tarefa no MongoDB
-            return tarefa; // Retorna a tarefa criada
+            return new
+            {
+                Mensagem = "Tarefa registrada com sucesso!",
+                Tarefa = tarefa // Retorna a tarefa criada
+            };
         }
+
 
         public async Task<Tarefas> AtualizarTarefa(Tarefas tarefaAtualizada)
         {

@@ -23,11 +23,14 @@ namespace horta_facil_api.Controllers
         public async Task<IActionResult> CriarTarefa([FromBody] Tarefas tarefa)
         {
             if (tarefa == null)
-                return BadRequest("Tarefa inválida.");
+            {
+                return BadRequest(new { Mensagem = "Dados da tarefa inválidos." });
+            }
 
-            var novaTarefa = await _tarefaService.CriarTarefa(tarefa);
-            return CreatedAtAction(nameof(ObterTarefaPorId), new { id = novaTarefa.Id }, novaTarefa);
+            var resultado = await _tarefaService.CriarTarefa(tarefa);
+            return CreatedAtAction(nameof(CriarTarefa), resultado); // Retorna 201 Created com o objeto de resultado
         }
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> AtualizarTarefa(Guid id, [FromBody] TarefaAtualizacaoDTO tarefaAtualizada)
