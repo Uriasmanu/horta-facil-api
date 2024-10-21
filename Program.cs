@@ -20,6 +20,7 @@ builder.Services.AddScoped<MongoDbContext>();
 builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped<PlantaService>();
 builder.Services.AddScoped<VoluntariosService>();
+builder.Services.AddScoped<TarefaService>();
 
 builder.Services.AddAuthentication(options =>
 {
