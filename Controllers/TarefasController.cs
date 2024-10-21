@@ -111,11 +111,21 @@ namespace horta_facil_api.Controllers
         [HttpPatch("{id}/status")]
         public async Task<IActionResult> DefinirStatusTarefa(Guid id, [FromBody] int novoStatus)
         {
-            var tarefaAtualizada = await _tarefaService.DefinirStatusTarefa(id, novoStatus);
-            if (tarefaAtualizada == null)
-                return NotFound();
-
-            return Ok(tarefaAtualizada);
+            try
+            {
+                var tarefaAtualizada = await _tarefaService.DefinirStatusTarefa(id, novoStatus);
+                return Ok(tarefaAtualizada);
+            }
+            catch (NotFoundException ex) // Captura a exceção personalizada
+            {
+                return NotFound(new { Mensagem = ex.Message }); // Retorna a mensagem da exceção
+            }
+            catch (Exception ex) // Captura outras exceções
+            {
+                return StatusCode(500, new { Mensagem = "Ocorreu um erro inesperado.", Detalhes = ex.Message });
+            }
         }
+
+
     }
 }
