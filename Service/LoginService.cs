@@ -1,7 +1,5 @@
 ﻿using horta_facil_api.Data;
-using horta_facil_api.DTOs;
 using horta_facil_api.Models;
-using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
@@ -11,9 +9,10 @@ using System.Threading.Tasks;
 
 namespace horta_facil_api.Service
 {
-    public class LoginService 
+    public class LoginService
     {
         private readonly IMongoCollection<Login> _logins;
+
         public LoginService(MongoDbContext context)
         {
             _logins = context.Logins;
@@ -31,43 +30,53 @@ namespace horta_facil_api.Service
             return login; // Retorna o objeto login, que tem as informações do usuário
         }
 
+        // Registrar novo usuário
+        public async Task<Login> RegistrarUsuarioAsync(LoginModel loginModel)
+        {
+            // Verificar se o e-mail já está em uso
+            var usuarioExistente = await _logins.Find(x => x.Email == loginModel.Email).FirstOrDefaultAsync();
+            if (usuarioExistente != null)
+            {
+                return null;  // E-mail já cadastrado
+            }
+
+            // Hash da senha antes de salvar
+            var senhaHash = SenhaHasher.HashSenha(loginModel.Password);
+
+            // Criar novo objeto Login
+            var novoLogin = new Login
+            {
+                Id = Guid.NewGuid(),
+                Username = loginModel.Email.Split('@')[0],  // Usar o prefixo do e-mail como username
+                Email = loginModel.Email,
+                Senha = senhaHash,
+            };
+
+            // Inserir novo usuário no banco
+            await _logins.InsertOneAsync(novoLogin);
+
+            // Retornar o objeto Login do usuário registrado
+            return novoLogin;
+        }
 
         // Buscar todos os usuarios
-        public async Task<List<LoginDTO>> BuscarTodosLogins()
+        public async Task<List<Login>> BuscarTodosLogins()
         {
-            // Busca todos os logins do banco de dados
             var logins = await _logins.Find(new BsonDocument()).ToListAsync();
-
-            // Mapeia cada Login para um LoginDTO
-            var loginDTOs = logins.Select(login => new LoginDTO
-            {
-                Id = login.Id,
-                UserName = login.Username,
-                email = login.Email,
-
-                
-            }).ToList();
-
-            return loginDTOs;
+            return logins;
         }
 
         // Buscar usuario por id
-        public async Task<LoginDTO> BuscarUsuarioPorId(Guid id)
+        public async Task<Login> BuscarUsuarioPorId(Guid id)
         {
             var login = await _logins.Find(x => x.Id == id).FirstOrDefaultAsync();
-            
-            if(login == null)
+
+            if (login == null)
             {
                 return null;
             }
 
-            return new LoginDTO
-            {
-                Id = login.Id,
-                UserName = login.Username,
-                email = login.Email,
-            };
-
+            return login;
         }
 
         // Deletar usuario por id

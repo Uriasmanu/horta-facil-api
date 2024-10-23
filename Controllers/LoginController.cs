@@ -7,7 +7,7 @@ namespace horta_facil_api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+
     public class LoginController : ControllerBase
     {
         private readonly LoginService _loginService;
@@ -16,6 +16,26 @@ namespace horta_facil_api.Controllers
         public LoginController(LoginService loginService)
         {
             _loginService = loginService;
+        }
+
+        // Registrar novo usuário
+        [HttpPost("registrar")]
+
+        public async Task<ActionResult> RegistrarUsuario([FromBody] LoginModel loginModel)
+        {
+            if (loginModel == null || string.IsNullOrEmpty(loginModel.Email) || string.IsNullOrEmpty(loginModel.Password))
+            {
+                return BadRequest("Dados inválidos");
+            }
+
+            var usuarioRegistrado = await _loginService.RegistrarUsuarioAsync(loginModel);
+
+            if (usuarioRegistrado == null)
+            {
+                return Conflict("E-mail já cadastrado");
+            }
+
+            return Ok(new { message = "Usuário registrado com sucesso", usuarioRegistrado.Email });
         }
 
 
