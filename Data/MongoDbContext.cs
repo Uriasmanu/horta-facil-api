@@ -50,6 +50,14 @@ namespace horta_facil_api.Data
                 return _database.GetCollection<Tarefas>("Tarefas");
             }
         }
+
+        public IMongoCollection<Recursos> Recursos
+        {
+            get
+            {
+                return _database.GetCollection<Recursos>("Recursos");
+            }
+        }
     }
 
 }
