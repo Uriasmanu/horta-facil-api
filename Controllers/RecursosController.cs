@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
 using horta_facil_api.Models;
 using horta_facil_api.Service;
+using System;
 
 namespace horta_facil_api.Controllers
 {
@@ -17,6 +16,7 @@ namespace horta_facil_api.Controllers
             _recursosService = recursosService;
         }
 
+        // GET: api/recursos
         [HttpGet]
         public ActionResult<IEnumerable<Recursos>> GetAll()
         {
@@ -24,54 +24,71 @@ namespace horta_facil_api.Controllers
             return Ok(recursos);
         }
 
+        // GET: api/recursos/{id}
         [HttpGet("{id}")]
         public ActionResult<Recursos> GetById(Guid id)
         {
-            var recurso = _recursosService.GetById(id);
-            if (recurso == null)
+            try
             {
-                return NotFound(); // Retorna 404 se não encontrar
+                var recurso = _recursosService.GetById(id);
+                return Ok(recurso);
             }
-            return Ok(recurso);
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message); // Retorna 404 com a mensagem da exceção
+            }
         }
 
+        // POST: api/recursos
         [HttpPost]
         public ActionResult<Recursos> Create([FromBody] Recursos recurso)
         {
             if (recurso == null)
             {
-                return BadRequest(); // Retorna 400 se o corpo da requisição for nulo
+                return BadRequest("Recurso não pode ser nulo."); // Retorna 400 se o recurso for nulo
             }
 
             var createdRecurso = _recursosService.Create(recurso);
-            return CreatedAtAction(nameof(GetById), new { id = createdRecurso.Id }, createdRecurso); // Retorna 201 e o recurso criado
+            return CreatedAtAction(nameof(GetById), new { id = createdRecurso.Id }, createdRecurso); // Retorna 201 com o recurso criado
         }
 
+        // PUT: api/recursos/{id}
         [HttpPut("{id}")]
         public ActionResult<Recursos> Update(Guid id, [FromBody] Recursos recurso)
         {
             if (recurso == null)
             {
-                return BadRequest(); // Retorna 400 se o corpo da requisição for nulo
+                return BadRequest("Recurso não pode ser nulo."); // Retorna 400 se o recurso for nulo
             }
 
-            var updatedRecurso = _recursosService.Update(id, recurso);
-            if (updatedRecurso == null)
+            try
             {
-                return NotFound(); // Retorna 404 se o recurso não for encontrado
+                var updatedRecurso = _recursosService.Update(id, recurso);
+                return Ok(updatedRecurso);
             }
-            return Ok(updatedRecurso); // Retorna 200 com o recurso atualizado
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message); // Retorna 404 com a mensagem da exceção
+            }
         }
 
+        // DELETE: api/recursos/{id}
         [HttpDelete("{id}")]
         public ActionResult Delete(Guid id)
         {
-            var result = _recursosService.Delete(id);
-            if (!result)
+            try
             {
-                return NotFound(); // Retorna 404 se o recurso não for encontrado
+                var result = _recursosService.Delete(id);
+                if (!result)
+                {
+                    return NotFound($"Recurso com ID '{id}' não encontrado para exclusão."); // Mensagem personalizada
+                }
+                return NoContent(); // Retorna 204 sem conteúdo
             }
-            return NoContent(); // Retorna 204 sem conteúdo
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message); // Retorna 404 com a mensagem da exceção
+            }
         }
     }
 }

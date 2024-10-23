@@ -23,7 +23,12 @@ namespace horta_facil_api.Service
 
         public Recursos GetById(Guid id)
         {
-            return _recursos.Find(recurso => recurso.Id == id).FirstOrDefault(); // Retorna um recurso específico
+            var recurso = _recursos.Find(recurso => recurso.Id == id).FirstOrDefault(); // Retorna um recurso específico
+            if (recurso == null)
+            {
+                throw new KeyNotFoundException($"Recurso com ID '{id}' não encontrado."); // Mensagem personalizada para 404
+            }
+            return recurso;
         }
 
         public Recursos Create(Recursos recurso)
@@ -36,10 +41,7 @@ namespace horta_facil_api.Service
         public Recursos Update(Guid id, Recursos recurso)
         {
             var existingRecurso = GetById(id);
-            if (existingRecurso == null)
-            {
-                return null; // Retorna null se o recurso não for encontrado
-            }
+            // Se já lançamos uma exceção em GetById, não precisamos mais verificar aqui.
 
             // Atualiza os campos do recurso
             existingRecurso.Nome = recurso.Nome;
@@ -53,7 +55,11 @@ namespace horta_facil_api.Service
         public bool Delete(Guid id)
         {
             var resultado = _recursos.DeleteOne(recurso => recurso.Id == id); // Remove o recurso do MongoDB
-            return resultado.DeletedCount > 0; // Retorna true se o recurso foi deletado
+            if (resultado.DeletedCount == 0)
+            {
+                throw new KeyNotFoundException($"Recurso com ID '{id}' não encontrado para exclusão."); // Mensagem personalizada para 404
+            }
+            return true; // Retorna true se o recurso foi deletado
         }
     }
 }
