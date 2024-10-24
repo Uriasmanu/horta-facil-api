@@ -44,18 +44,18 @@ namespace horta_facil_api.Service
 
         public Recursos Create(RecursosDTO recursoDTO)
         {
-            // Converte o DTO para o modelo de dados
             var recurso = new Recursos
             {
                 Id = Guid.NewGuid(),
                 Nome = recursoDTO.Nome,
                 TipoRecurso = recursoDTO.TipoRecurso,
-                DataCriacao = DateTime.Now
+
             };
 
             _recursos.InsertOne(recurso);
-            return recurso; // Retorna o modelo criado
+            return recurso;
         }
+
 
         public RecursosDTO Update(Guid id, RecursosDTO recursoDTO)
         {
