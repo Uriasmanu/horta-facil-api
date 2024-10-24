@@ -3,6 +3,7 @@ using horta_facil_api.Models;
 using horta_facil_api.Service;
 using System;
 using System.Collections.Generic;
+using horta_facil_api.Services;
 
 namespace horta_facil_api.Controllers
 {
@@ -19,10 +20,10 @@ namespace horta_facil_api.Controllers
 
         // GET: api/recursos
         [HttpGet]
-        public ActionResult<IEnumerable<RecursosDTO>> GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var recursos = _recursosService.GetAll();
-            return Ok(recursos); // Retorna todos os recursos como DTOs
+            var tarefas = await _recursosService.GetAll();
+            return Ok(tarefas);
         }
 
         // GET: api/recursos/{id}

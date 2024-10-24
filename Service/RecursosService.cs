@@ -16,16 +16,10 @@ namespace horta_facil_api.Service
             _recursos = context.Recursos;
         }
 
-        public IEnumerable<RecursosDTO> GetAll()
+        public async Task<List<Recursos>> GetAll()
         {
-            // Retorna todos os recursos convertendo para DTO
-            return _recursos.Find(recurso => true)
-                            .ToList()
-                            .Select(recurso => new RecursosDTO
-                            {
-                                Nome = recurso.Nome,
-                                TipoRecurso = recurso.TipoRecurso
-                            });
+
+            return await _recursos.Find(t => true).ToListAsync();
         }
 
         public RecursosDTO GetById(Guid id)
