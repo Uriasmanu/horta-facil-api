@@ -16,50 +16,77 @@ namespace horta_facil_api.Service
             _recursos = context.Recursos;
         }
 
-        public IEnumerable<Recursos> GetAll()
+        public IEnumerable<RecursosDTO> GetAll()
         {
-            return _recursos.Find(recurso => true).ToList(); // Retorna todos os recursos
+            // Retorna todos os recursos convertendo para DTO
+            return _recursos.Find(recurso => true)
+                            .ToList()
+                            .Select(recurso => new RecursosDTO
+                            {
+                                Nome = recurso.Nome,
+                                TipoRecurso = recurso.TipoRecurso
+                            });
         }
 
-        public Recursos GetById(Guid id)
+        public RecursosDTO GetById(Guid id)
         {
-            var recurso = _recursos.Find(recurso => recurso.Id == id).FirstOrDefault(); // Retorna um recurso específico
+            var recurso = _recursos.Find(r => r.Id == id).FirstOrDefault();
             if (recurso == null)
             {
-                throw new KeyNotFoundException($"Recurso com ID '{id}' não encontrado."); // Mensagem personalizada para 404
+                throw new KeyNotFoundException($"Recurso com ID '{id}' não encontrado.");
             }
-            return recurso;
+            return new RecursosDTO
+            {
+                Nome = recurso.Nome,
+                TipoRecurso = recurso.TipoRecurso
+            };
         }
 
-        public Recursos Create(Recursos recurso)
+        public Recursos Create(RecursosDTO recursoDTO)
         {
-            recurso.Id = Guid.NewGuid(); // Garante que um novo ID é gerado
-            _recursos.InsertOne(recurso); // Insere o recurso no MongoDB
-            return recurso;
+            // Converte o DTO para o modelo de dados
+            var recurso = new Recursos
+            {
+                Id = Guid.NewGuid(),
+                Nome = recursoDTO.Nome,
+                TipoRecurso = recursoDTO.TipoRecurso,
+                DataCriacao = DateTime.Now
+            };
+
+            _recursos.InsertOne(recurso);
+            return recurso; // Retorna o modelo criado
         }
 
-        public Recursos Update(Guid id, Recursos recurso)
+        public RecursosDTO Update(Guid id, RecursosDTO recursoDTO)
         {
-            var existingRecurso = GetById(id);
-            // Se já lançamos uma exceção em GetById, não precisamos mais verificar aqui.
+            var existingRecurso = _recursos.Find(r => r.Id == id).FirstOrDefault();
+            if (existingRecurso == null)
+            {
+                throw new KeyNotFoundException($"Recurso com ID '{id}' não encontrado.");
+            }
 
             // Atualiza os campos do recurso
-            existingRecurso.Nome = recurso.Nome;
-            existingRecurso.TipoRecurso = recurso.TipoRecurso;
-            existingRecurso.DataCriacao = DateTime.Now; // Atualiza a data de criação
+            existingRecurso.Nome = recursoDTO.Nome;
+            existingRecurso.TipoRecurso = recursoDTO.TipoRecurso;
 
-            _recursos.ReplaceOne(r => r.Id == id, existingRecurso); // Atualiza o recurso no MongoDB
-            return existingRecurso;
+            _recursos.ReplaceOne(r => r.Id == id, existingRecurso);
+
+            // Retorna o DTO atualizado
+            return new RecursosDTO
+            {
+                Nome = existingRecurso.Nome,
+                TipoRecurso = existingRecurso.TipoRecurso
+            };
         }
 
         public bool Delete(Guid id)
         {
-            var resultado = _recursos.DeleteOne(recurso => recurso.Id == id); // Remove o recurso do MongoDB
+            var resultado = _recursos.DeleteOne(r => r.Id == id);
             if (resultado.DeletedCount == 0)
             {
-                throw new KeyNotFoundException($"Recurso com ID '{id}' não encontrado para exclusão."); // Mensagem personalizada para 404
+                throw new KeyNotFoundException($"Recurso com ID '{id}' não encontrado para exclusão.");
             }
-            return true; // Retorna true se o recurso foi deletado
+            return true;
         }
     }
 }

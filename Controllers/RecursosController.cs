@@ -2,11 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 using horta_facil_api.Models;
 using horta_facil_api.Service;
 using System;
+using System.Collections.Generic;
 
 namespace horta_facil_api.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class RecursosController : ControllerBase
     {
         private readonly RecursosService _recursosService;
@@ -18,57 +19,57 @@ namespace horta_facil_api.Controllers
 
         // GET: api/recursos
         [HttpGet]
-        public ActionResult<IEnumerable<Recursos>> GetAll()
+        public ActionResult<IEnumerable<RecursosDTO>> GetAll()
         {
             var recursos = _recursosService.GetAll();
-            return Ok(recursos);
+            return Ok(recursos); // Retorna todos os recursos como DTOs
         }
 
         // GET: api/recursos/{id}
         [HttpGet("{id}")]
-        public ActionResult<Recursos> GetById(Guid id)
+        public ActionResult<RecursosDTO> GetById(Guid id)
         {
             try
             {
                 var recurso = _recursosService.GetById(id);
-                return Ok(recurso);
+                return Ok(recurso); // Retorna o recurso específico como DTO
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(ex.Message); // Retorna 404 com a mensagem da exceção
+                return NotFound(ex.Message); // Retorna 404 se não encontrado
             }
         }
 
         // POST: api/recursos
         [HttpPost]
-        public ActionResult<Recursos> Create([FromBody] Recursos recurso)
+        public ActionResult<Recursos> Create(RecursosDTO recursoDTO)
         {
-            if (recurso == null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest("Recurso não pode ser nulo."); // Retorna 400 se o recurso for nulo
+                return BadRequest(ModelState); // Retorna 400 se o modelo for inválido
             }
 
-            var createdRecurso = _recursosService.Create(recurso);
-            return CreatedAtAction(nameof(GetById), new { id = createdRecurso.Id }, createdRecurso); // Retorna 201 com o recurso criado
+            var novoRecurso = _recursosService.Create(recursoDTO);
+            return CreatedAtAction(nameof(GetById), new { id = novoRecurso.Id }, novoRecurso); // Retorna 201 Created
         }
 
         // PUT: api/recursos/{id}
         [HttpPut("{id}")]
-        public ActionResult<Recursos> Update(Guid id, [FromBody] Recursos recurso)
+        public ActionResult<Recursos> Update(Guid id, RecursosDTO recursoDTO)
         {
-            if (recurso == null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest("Recurso não pode ser nulo."); // Retorna 400 se o recurso for nulo
+                return BadRequest(ModelState); // Retorna 400 se o modelo for inválido
             }
 
             try
             {
-                var updatedRecurso = _recursosService.Update(id, recurso);
-                return Ok(updatedRecurso);
+                var recursoAtualizado = _recursosService.Update(id, recursoDTO);
+                return Ok(recursoAtualizado); // Retorna 200 OK com o recurso atualizado
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(ex.Message); // Retorna 404 com a mensagem da exceção
+                return NotFound(ex.Message); // Retorna 404 se não encontrado
             }
         }
 
@@ -78,16 +79,12 @@ namespace horta_facil_api.Controllers
         {
             try
             {
-                var result = _recursosService.Delete(id);
-                if (!result)
-                {
-                    return NotFound($"Recurso com ID '{id}' não encontrado para exclusão."); // Mensagem personalizada
-                }
-                return NoContent(); // Retorna 204 sem conteúdo
+                _recursosService.Delete(id);
+                return NoContent(); // Retorna 204 No Content se a exclusão foi bem-sucedida
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(ex.Message); // Retorna 404 com a mensagem da exceção
+                return NotFound(ex.Message); // Retorna 404 se não encontrado
             }
         }
     }
